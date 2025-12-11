@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aayusha Limbu | CMPN202 Journal</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+      :root {
+        --color-edge: lab(90.6853% 0.399232 -1.45452);
+      }
+
+      .container-wrapper {
+        width: 100%;
+        padding-inline: calc(0.25rem * 2);
+        margin-inline: auto;
+      }
+
+      .border-edge {
+        border-color: var(--color-edge) !important;
+      }
+
+      .icon-container {
+        border-style: solid;
+        border-width: 1px;
+        background: lab(96.1634% 0.0993311 -0.364041);
+        border-color: color-mix(
+          in oklab,
+          lab(47.8878% 1.65477 -5.77283) 15%,
+          transparent
+        );
+        outline-color: color-mix(
+          in oklab,
+          lab(65.6464% 1.53497 -5.42429) 50%,
+          transparent
+        );
+        color: lab(65.6464% 1.53497 -5.42429);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container-wrapper max-w-screen! overflow-x-hidden">
+      <div
+        class="relative mx-auto px-0! container md:max-w-3xl screen-line-before screen-line-after border-x border-edge min-h-dvh"
+      >
+        <div
+          class="relative flex h-8 w-full border-x border-edge before:absolute before:-left-[100vw] before:-z-1 before:h-8 before:w-[200vw] before:border-y before:bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] before:bg-size-[10px_10px] before:[--pattern-foreground:var(--color-edge)]/56 before:[border-color:var(--color-edge)]/56 after:absolute after:-left-[100vw] after:-z-1 after:h-8 after:w-[200vw] after:border-y after:bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] after:bg-size-[10px_10px] after:[--pattern-foreground:var(--color-edge)]/56 after:[border-color:var(--color-edge)]/56"
+        ></div>
+        <div class="relative dark aspect-[2.3] p-4 z-2 border-b border-edge">
+          <div
+            class="flex h-16 items-center justify-between px-2 max-sm:px-4 border-b border-gray-950/5 dark:border-white/10 mb-20"
+          >
+            <div
+              class="font-mono text-xs font-medium tracking-widest text-gray-500 uppercase"
+            >
+              CMPN202 • Level 5 Computing
+            </div>
+            <div>
+              <img
+                src="https://www.roehampton.ac.uk/Static/images/roehampton-logo-trans.svg"
+                alt="University of Roehampton"
+                class="h-10 mr-5 w-auto"
+              />
+            </div>
+          </div>
+          <div
+            class="relative before:absolute before:top-0 before:h-px before:w-[200vw] before:bg-gray-950/5 dark:before:bg-white/10 before:-left-[100vw] after:absolute after:bottom-0 after:h-px after:w-[200vw] after:bg-gray-950/5 dark:after:bg-white/10 after:-left-[100vw]"
+          >
+            <div class="px-2 max-sm:px-4">
+              <h1
+                class="mt-2 text-4xl tracking-tighter text-balance max-lg:font-medium sm:text-5xl lg:text-7xl"
+              >
+                Linux Systems Development Portfolio
+              </h1>
+              <div class="mt-4">
+                <div class="flex items-center gap-4">
+                  <div>
+                    <p class="text-2xl">
+                      By Aayusha Limbu
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="mt-5 px-2 max-sm:px-4 border-t border-gray-950/5 dark:border-white/10 pt-10"
+          >
+            <h2
+              class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-white"
+            >
+              Development Timeline
+            </h2>
+            <p class="mt-2 text-gray-500">
+              A seven-week chronicle of configuring and deploying enterprise-grade Linux server solutions.
+            </p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 gap-4">
+          <div data-state="closed" id="journal-container"></div>
+        </div>
+      </div>
+    </main>
+    <script>
+      const TOTAL_WEEKS = 7;
+      const CONTAINER = document.getElementById("journal-container");
+      function parseFrontmatter(markdown) {
+        const result = {
+          title: "Untitled",
+          description: "No description provided.",
+          date: "TBD",
+        };
+        const match = markdown.match(/^---\s*[\r\n]+([\s\S]*?)[\r\n]+---/);
+
+        if (match && match[1]) {
+          const lines = match[1].split("\n");
+          lines.forEach((line) => {
+            const colonIndex = line.indexOf(":");
+            if (colonIndex > 0) {
+              const key = line.slice(0, colonIndex).trim();
+              let value = line.slice(colonIndex + 1).trim();
+              value = value.replace(/^["'](.*)["']$/, "$1");
+              if (key && value) result[key] = value;
+            }
+          });
+        }
+        return result;
+      }
+
+      function createActiveCard(weekNum, meta) {
+        return `
+        <a
+              class="group/cert flex items-center pr-2 border-b border-edge"
+              href="content.html?page=week${weekNum}"
+            >
+              <div
+                class="mx-4 flex size-6 shrink-0 items-center justify-center rounded-lg select-none icon-container [&amp;_svg]:size-4"
+                aria-hidden="true"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-file-text"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"
+                  ></path>
+                  <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
+                  <path d="M10 9H8"></path>
+                  <path d="M16 13H8"></path>
+                  <path d="M16 17H8"></path>
+                </svg>
+              </div>
+              <div
+                class="flex-1 space-y-1 border-l border-dashed border-edge p-4 pr-2"
+              >
+                <h3
+                  class="leading-snug font-medium text-balance underline-offset-4 group-hover/blog:underline"
+                >
+                   ${meta.title}
+                </h3>
+                <div
+                  class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground"
+                >
+                  <dl>
+                    <dt class="sr-only">Issued by</dt>
+                    <dd>
+                      <span aria-hidden="true">@</span
+                      ><span class="ml-0.5">aayusha limbu</span>
+                    </dd>
+                  </dl>
+                  <div
+                    data-orientation="vertical"
+                    role="none"
+                    data-slot="separator"
+                    class="bg-border shrink-0 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-px data-[orientation=vertical]:h-4"
+                  ></div>
+                  <dl>
+                    <dt class="sr-only">Issued on</dt>
+                    <dd><span>${meta.date || "Week " + weekNum}</span></dd>
+                  </dl>
+                </div>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-arrow-up-right size-4 text-muted-foreground"
+                aria-hidden="true"
+              >
+                <path d="M7 7h10v10"></path>
+                <path d="M7 17 17 7"></path>
+              </svg>
+            </a>
+               `;
+      }
+
+      function createPendingCard(weekNum) {
+        return `
+          <div
+              class="group/cert flex items-center pr-2 border-b border-edge animate-pulse opacity-60 cursor-pointer"
+            >
+              <div
+                class="mx-4 flex size-6 shrink-0 items-center justify-center rounded-lg select-none icon-container [&amp;_svg]:size-4"
+                aria-hidden="true"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="lucide lucide-file-text"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"
+                  ></path>
+                  <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
+                  <path d="M10 9H8"></path>
+                  <path d="M16 13H8"></path>
+                  <path d="M16 17H8"></path>
+                </svg>
+              </div>
+              <div
+                class="flex-1 space-y-1 border-l border-dashed border-edge p-4 pr-2"
+              >
+                <h3
+                  class="leading-snug font-medium text-balance underline-offset-4 group-hover/blog:underline text-gray-400"
+                >
+                   Pending
+                </h3>
+                <div
+                  class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-400"
+                >
+                  <dl>
+                    <dt class="sr-only">Issued by</dt>
+                    <dd>
+                      <span aria-hidden="true">@</span
+                      ><span class="ml-0.5">aayusha</span>
+                    </dd>
+                  </dl>
+                  <div
+                    data-orientation="vertical"
+                    role="none"
+                    data-slot="separator"
+                    class="bg-border shrink-0 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-px data-[orientation=vertical]:h-4"
+                  ></div>
+                  <dl>
+                    <dt class="sr-only">Issued on</dt>
+                    <dd><span>Week ${weekNum}</span></dd>
+                  </dl>
+                </div>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-arrow-up-right size-4 text-gray-400"
+                aria-hidden="true"
+              >
+                <path d="M7 7h10v10"></path>
+                <path d="M7 17 17 7"></path>
+              </svg>
+            </div>`;
+      }
+
+      async function loadJournalEntries() {
+        CONTAINER.innerHTML = "";
+
+        for (let i = 1; i <= TOTAL_WEEKS; i++) {
+          try {
+            const response = await fetch(`weekly_report/week${i}.md`);
+
+            if (response.ok) {
+              const text = await response.text();
+              const meta = parseFrontmatter(text);
+              CONTAINER.innerHTML += createActiveCard(i, meta);
+            } else {
+              CONTAINER.innerHTML += createPendingCard(i);
+            }
+          } catch (error) {
+            console.error(`Error loading week ${i}`, error);
+            CONTAINER.innerHTML += createPendingCard(i);
+          }
+        }
+      }
+      loadJournalEntries();
+    </script>
+  </body>
+</html>

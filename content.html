@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html class="antialiased">
+  <head>
+    <title>Journal Viewer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+      @font-face {
+        font-family: "Mechanized";
+        src: url("/font/Mechanized-Regular.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      ::-webkit-scrollbar {
+        display: none;
+      }
+
+      :root {
+        --color-edge: lab(90.6853% 0.399232 -1.45452);
+      }
+
+      .border-edge {
+        border-color: var(--color-edge) !important;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              heading: ["Mechanized", "serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+            typography: (theme) => ({
+              DEFAULT: {
+                css: {
+                  maxWidth: "none",
+                  fontFamily: '"Inter", sans-serif',
+                  h1: { fontFamily: '"Mechanized", serif', fontWeight: "700" },
+                  h2: { fontFamily: '"Mechanized", serif', fontWeight: "700" },
+                  h3: { fontFamily: '"Mechanized", serif', fontWeight: "700" },
+                  h4: { fontFamily: '"Mechanized", serif', fontWeight: "700" },
+                  pre: {
+                    backgroundColor: "#f5f5f5",
+                    color: "#1f2937",
+                    borderRadius: "1rem !important",
+                    fontFamily: '"JetBrains Mono", monospace',
+                    fontSize: "0.8em !important",
+                    lineHeight: "1.2 !important",
+                    margin: "0 !important",
+                  },
+                  "code::before": { content: '""' },
+                  "code::after": { content: '""' },
+                  table: {
+                    tableLayout: "auto",
+                    borderCollapse: "separate",
+                    borderSpacing: 0,
+                    background: "#fafafa",
+                    borderRadius: ".5em",
+                    border: "1px solid #e5e7eb",
+                    width: "100%",
+                    marginTop: "2em",
+                    marginBottom: "2em",
+                    fontSize: ".8em !important",
+                    lineHeight: "1.71429",
+                    overflow: "hidden",
+                    color: "#1f2937",
+                  },
+                  th: {
+                    textAlign: "start",
+                    padding: "calc(.25rem * 2.5) !important",
+                    borderInlineStart: "1px solid #e5e7eb",
+                    background: "#f3f4f6",
+                    borderBottomWidth: "1px",
+                    borderBottomColor: "#e5e7eb",
+                    color: "#1f2937",
+                  },
+                  td: {
+                    color: "#4b5563",
+                    textAlign: "start",
+                    borderInlineStart: "1px solid #e5e7eb",
+                    padding: "calc(.25rem * 2.5) !important",
+                    borderBottom: "1px solid #e5e7eb",
+                    strong: {
+                      color: "#1f2937",
+                    },
+                    code: {
+                      color: "#1f2937",
+                    },
+                  },
+                },
+              },
+            }),
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-white min-h-screen text-neutral-900 font-sans">
+    <div class="max-w-4xl mx-auto px-6 py-5 bg-white border-x">
+      <a
+        href="index.html"
+        class="group inline-flex items-center text-sm font-semibold text-neutral-600 hover:text-sky-500 transition-colors mb-5"
+      >
+        <div
+          class="mr-2 p-1 rounded-full bg-neutral-100 group-hover:bg-sky-500/10 transition-colors"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            ></path>
+          </svg>
+        </div>
+        Back to Dashboard
+      </a>
+
+      <div
+        class="z-50 relative flex h-8 w-full border-edge before:absolute before:-left-[100vw] before:-z-1 before:h-8 before:w-[200vw] before:border-y before:bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] before:bg-size-[10px_10px] before:[--pattern-foreground:var(--color-edge)]/56 before:[border-color:var(--color-edge)]/56 after:absolute after:-left-[100vw] after:-z-1 after:h-8 after:w-[200vw] after:border-y after:bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] after:bg-size-[10px_10px] after:[--pattern-foreground:var(--color-edge)]/56 after:[border-color:var(--color-edge)]/56"
+      ></div>
+      <div
+        id="nav-top"
+        class="flex justify-between items-center my-2 text-sm font-medium text-neutral-600 tracking-wide"
+      ></div>
+      <div
+        class="z-50 relative flex h-8 w-full border-edge before:absolute before:-left-[100vw] before:-z-1 before:h-8 before:w-[200vw] before:border-y before:bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] before:bg-size-[10px_10px] before:[--pattern-foreground:var(--color-edge)]/56 before:[border-color:var(--color-edge)]/56 after:absolute after:-left-[100vw] after:-z-1 after:h-8 after:w-[200vw] after:border-y after:bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] after:bg-size-[10px_10px] after:[--pattern-foreground:var(--color-edge)]/56 after:[border-color:var(--color-edge)]/56"
+      ></div>
+      <header
+        id="journal-header"
+        class="mb-5 mt-3 pb-10 border-b border-neutral-200"
+      >
+        <div class="animate-pulse h-10 bg-neutral-200 rounded w-1/2 mb-4"></div>
+        <div class="animate-pulse h-4 bg-neutral-200 rounded w-1/3"></div>
+      </header>
+
+      <article
+        id="content"
+        class="prose prose-lg text-justify prose-headings:font-bold prose-a:text-sky-500 prose-img:rounded-xl prose-img:shadow-lg"
+      >
+        <div class="animate-pulse space-y-6">
+          <div class="h-4 bg-neutral-200 rounded"></div>
+          <div class="h-4 bg-neutral-200 rounded"></div>
+          <div class="h-4 bg-neutral-200 rounded w-5/6"></div>
+        </div>
+      </article>
+
+      <div
+        class="z-50 relative flex h-8 w-full mt-10 border-edge before:absolute before:-left-[100vw] before:-z-1 before:h-8 before:w-[200vw] before:border-y before:bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] before:bg-size-[10px_10px] before:[--pattern-foreground:var(--color-edge)]/56 before:[border-color:var(--color-edge)]/56 after:absolute after:-left-[100vw] after:-z-1 after:h-8 after:w-[200vw] after:border-y after:bg-[repeating-linear-gradient(315deg,var(--pattern-foreground)_0,var(--pattern-foreground)_1px,transparent_0,transparent_50%)] after:bg-size-[10px_10px] after:[--pattern-foreground:var(--color-edge)]/56 after:[border-color:var(--color-edge)]/56"
+      ></div>
+
+      <div
+        id="nav-bottom"
+        class="flex justify-between items-center pt-10 border-neutral-200 text-sm font-medium text-neutral-600 tracking-wide"
+      ></div>
+    </div>
+
+    <div
+      id="lightbox"
+      class="fixed inset-0 z-[100] bg-white/95 opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-2 backdrop-blur-sm"
+      onclick="closeLightbox()"
+    >
+      <img
+        id="lightbox-img"
+        src=""
+        class="max-w-[95vw] max-h-[95vh] w-full h-full rounded-lg shadow-2xl object-contain transform transition-transform duration-300 ease-out cursor-zoom-out"
+        alt="Full screen view"
+      />
+    </div>
+
+    <script>
+      const DOM = {
+        lightbox: document.getElementById("lightbox"),
+        lightboxImg: document.getElementById("lightbox-img"),
+        navTop: document.getElementById("nav-top"),
+        navBottom: document.getElementById("nav-bottom"),
+        journalHeader: document.getElementById("journal-header"),
+        content: document.getElementById("content"),
+      };
+
+      const generateId = () => Math.random().toString(36).substr(2, 9);
+
+      const toggleCode = (id) => {
+        const wrapper = document.getElementById(`wrapper-${id}`);
+        const gradient = document.getElementById(`gradient-${id}`);
+        const headerBtnText = document.getElementById(`header-btn-text-${id}`);
+        const headerIcon = document.getElementById(`header-icon-${id}`);
+        const isExpanded = wrapper.style.maxHeight !== "500px";
+
+        if (isExpanded) {
+          wrapper.style.maxHeight = "500px";
+          gradient.style.display = "flex";
+          headerBtnText.textContent = "Expand";
+          headerIcon.style.transform = "rotate(0deg)";
+        } else {
+          wrapper.style.maxHeight = wrapper.scrollHeight + "px";
+          gradient.style.display = "none";
+          headerBtnText.textContent = "Collapse";
+          headerIcon.style.transform = "rotate(180deg)";
+        }
+      };
+
+      const openLightbox = (src, alt) => {
+        DOM.lightboxImg.src = src;
+        DOM.lightboxImg.alt = alt || "";
+        document.body.style.overflow = "hidden";
+        DOM.lightbox.classList.remove("opacity-0", "pointer-events-none");
+        DOM.lightbox.classList.add("opacity-100", "pointer-events-auto");
+      };
+
+      const closeLightbox = () => {
+        DOM.lightbox.classList.remove("opacity-100", "pointer-events-auto");
+        DOM.lightbox.classList.add("opacity-0", "pointer-events-none");
+        document.body.style.overflow = "auto";
+        setTimeout(() => {
+          DOM.lightboxImg.src = "";
+        }, 300);
+      };
+
+      const splitContent = (text) => {
+        const match = text.match(
+          /^---\s*[\r\n]+([\s\S]*?)[\r\n]+---\s*[\r\n]+([\s\S]*)$/
+        );
+
+        if (!match) return { metadata: {}, content: text };
+
+        const metadata = {};
+        match[1].split("\n").forEach((line) => {
+          const colonIdx = line.indexOf(":");
+          if (colonIdx > 0) {
+            const key = line.slice(0, colonIdx).trim();
+            const val = line.slice(colonIdx + 1).trim();
+            metadata[key] = val;
+          }
+        });
+
+        return { metadata, content: match[2] };
+      };
+
+      const createCodeBlockHTML = (id, lang, code) => {
+        const icons = {
+          terminal: `<svg xmlns="http://www.w3.org/2000/svg" class="mr-1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="m7 11 2-2-2-2"/><path d="M11 13h4"/><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>`,
+          expand: `<svg class="w-4 h-4 transition-transform duration-300" id="header-icon-${id}" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>`,
+        };
+
+        return `
+          <div class="not-prose my-6 border border-neutral-200 rounded-lg relative">
+            <div class="flex items-center justify-between rounded-t-lg py-2 px-4 text-xs font-semibold bg-neutral-100 border-b border-neutral-200 text-neutral-700 select-none" style="font-family: 'JetBrains Mono', monospace;">
+              <div class="flex items-center text-xs font-semibold text-neutral-700 font-mono">
+                ${icons.terminal}
+                ${lang}
+              </div>
+              <button id="header-btn-${id}" onclick="toggleCode('${id}')" class="flex items-center gap-2 text-xs text-neutral-600 hover:text-neutral-900 transition-colors overflow-trigger hidden">
+                <span id="header-btn-text-${id}">Expand</span>
+                ${icons.expand}
+              </button>
+            </div>
+            <pre class="rounded-b-lg text-sm overflow-x-auto"><code id="wrapper-${id}" class="hljs language-${lang}" style="padding: 0.75rem; background-color: #f6f8fa; max-height: none;">${code}</code></pre>
+            <div id="gradient-${id}" class="absolute inset-x-0 bottom-0 flex h-24 items-center justify-center rounded-b-lg bg-gradient-to-b from-transparent to-white pb-4 hidden">
+              <button onclick="toggleCode('${id}')" class="bg-neutral-200 hover:bg-neutral-300 text-neutral-900 text-xs font-medium px-4 py-1.5 rounded-full shadow-lg border border-neutral-300 transition-all hover:scale-105 flex items-center gap-2">
+                Expand
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7-7-7m14-8l-7 7-7-7" /></svg>
+              </button>
+            </div>
+          </div>
+          <img src="" onerror="setTimeout(() => checkHeight('${id}'), 50)" style="display:none;" />
+        `;
+      };
+
+      window.checkHeight = (id) => {
+        const wrapper = document.getElementById(`wrapper-${id}`);
+        const gradient = document.getElementById(`gradient-${id}`);
+        const headerBtn = document.getElementById(`header-btn-${id}`);
+
+        if (wrapper.scrollHeight > 500) {
+          wrapper.style.maxHeight = "500px";
+          gradient.classList.remove("hidden");
+          headerBtn.classList.remove("hidden");
+        } else {
+          wrapper.style.maxHeight = "none";
+        }
+      };
+
+      const renderer = new marked.Renderer();
+
+      renderer.image = function ({ href, title, text }) {
+        if (href.startsWith('/')) {
+          href = href.slice(1);
+        }
+        const caption = text
+          ? `<figcaption class="mt-3 text-center text-sm text-neutral-500 dark:text-neutral-400 font-medium">${text}</figcaption>`
+          : "";
+        const safeHref = encodeURI(href);
+        const safeText = text ? text.replace(/'/g, "\\'") : "";
+        return `
+          <figure class="flex flex-col items-center my-8">
+              <img 
+              src="${safeHref}" 
+              alt="${text}" 
+              title="${title || ""}" 
+              onclick="openLightbox('${safeHref}', '${safeText}')"
+              class="rounded-xl cursor-zoom-in shadow-2xl border border-neutral-100 dark:border-neutral-800 max-h-[600px] w-auto object-contain bg-neutral-50 dark:bg-neutral-900/50">
+              ${caption}
+          </figure>
+                `;
+      };
+
+      renderer.code = function (token) {
+        const rawCode =
+          typeof token === "object" && token.text ? token.text : token;
+        const lang =
+          typeof token === "object" && token.lang ? token.lang : arguments[1];
+
+        const lines = rawCode ? rawCode.split("\n") : [];
+        let minIndent = Infinity;
+
+        for (const line of lines) {
+          if (line.trim().length === 0) continue;
+          const indent = line.search(/\S/);
+          if (indent !== -1 && indent < minIndent) {
+            minIndent = indent;
+          }
+        }
+
+        let code = rawCode;
+        if (minIndent !== Infinity && minIndent > 0) {
+          code = lines
+            .map((line) => {
+              if (line.trim().length === 0) return "";
+              return line.length >= minIndent ? line.slice(minIndent) : line;
+            })
+            .join("\n");
+        }
+
+        code = code.trim();
+
+        const id = generateId();
+        const language = lang || "text";
+
+        let content = code;
+        if (typeof hljs !== "undefined") {
+          try {
+            if (language && hljs.getLanguage(language)) {
+              content = hljs.highlight(code, { language: language }).value;
+            } else {
+              const result = hljs.highlightAuto(code);
+              content = result.value;
+            }
+          } catch (e) {
+            console.warn("Highlight error:", e);
+            content = code
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;");
+          }
+        } else {
+          content = code
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+        }
+
+        return createCodeBlockHTML(id, language, content);
+      };
+
+      marked.use({ renderer });
+
+      const setupNavigation = (currentPage) => {
+        const match = currentPage.match(/week(\d+)/i);
+        if (!match) return;
+
+        const currentNum = parseInt(match[1]);
+        const maxWeeks = 7;
+        const prevBtn =
+          currentNum > 1
+            ? `
+          <a href="content.html?page=week${
+            currentNum - 1
+          }" class="group flex items-center hover:text-white transition-colors">
+            <svg class="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            <span>Week ${currentNum - 1}</span>
+          </a>`
+            : `<div></div>`;
+
+        const nextBtn =
+          currentNum < maxWeeks
+            ? `
+          <a href="content.html?page=week${
+            currentNum + 1
+          }" class="group flex items-center hover:text-white transition-colors text-right">
+            <span>Week ${currentNum + 1}</span>
+            <svg class="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+          </a>`
+            : `<div></div>`;
+
+        const navHtml = `${prevBtn}${nextBtn}`;
+        DOM.navTop.innerHTML = navHtml;
+        DOM.navBottom.innerHTML = navHtml;
+      };
+
+      const loadJournalEntry = (page) => {
+        const fetchPath = `weekly_report/${page}.md`;
+
+        fetch(fetchPath)
+          .then((response) => {
+            if (!response.ok) throw new Error(`Failed to load ${fetchPath}`);
+            return response.text();
+          })
+          .then((fullText) => {
+            const { metadata, content } = splitContent(fullText);
+
+            DOM.journalHeader.innerHTML = `
+              <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-neutral-900 mb-6 font-heading">
+                ${metadata.title || "Untitled Entry"}
+              </h1>
+              <p class="text-lg md:text-xl text-neutral-500 leading-relaxed mb-6">
+                ${metadata.description || ""}
+              </p>
+              <div class="flex items-center text-sm font-medium text-sky-500">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                <span class="uppercase tracking-wider">${
+                  metadata.date || "Date TBD"
+                }</span>
+                <span class="mx-3 text-neutral-300 dark:text-neutral-700">•</span>
+                <span class="text-neutral-400 dark:text-neutral-500">Author: ${
+                  metadata.author || "Student"
+                }</span>
+              </div>
+            `;
+
+            DOM.content.innerHTML = marked.parse(content);
+          })
+          .catch((error) => {
+            console.error(error);
+            DOM.journalHeader.style.display = "none";
+            DOM.content.innerHTML = `
+              <div class="text-center py-20">
+                <h1 class="text-4xl font-bold text-neutral-200 dark:text-neutral-800 mb-4">404</h1>
+                <p class="text-neutral-500">Could not load entry. Please check the URL.</p>
+              </div>
+            `;
+          });
+      };
+
+      window.addEventListener("DOMContentLoaded", () => {
+        const params = new URLSearchParams(window.location.search);
+        const page = params.get("page");
+
+        if (page) {
+          setupNavigation(page);
+          loadJournalEntry(page);
+        } else {
+          DOM.journalHeader.style.display = "none";
+          DOM.content.innerHTML =
+            "<h1 class='text-center mt-20 text-neutral-400'>No entry selected</h1>";
+        }
+      });
+
+      DOM.lightbox.addEventListener("click", closeLightbox);
+    </script>
+  </body>
+</html>
